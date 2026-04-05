@@ -1,0 +1,120 @@
+---
+import type { YearData } from '../types';
+
+interface Props {
+  data: YearData;
+}
+
+const { data } = Astro.props;
+const { year, yearOpen, yearClose, pctChange, bars } = data;
+
+const isComplete = yearClose !== null && pctChange !== null;
+const positive = pctChange !== null ? pctChange >= 0 : null;
+const sign = positive ? '+' : '';
+---
+
+<section class="year-panel">
+  <div class="year-meta">
+    <h2 class="year-heading">{year}</h2>
+    <dl class="stats">
+      <div class="stat">
+        <dt>Open</dt>
+        <dd>{yearOpen.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</dd>
+      </div>
+      <div class="stat">
+        <dt>Close</dt>
+        <dd>{isComplete
+          ? yearClose!.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+          : bars.length > 0
+            ? bars[bars.length - 1].close.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+            : '—'
+        }</dd>
+      </div>
+      <div class="stat">
+        <dt>{isComplete ? 'Return' : 'YTD'}</dt>
+        <dd class:list={['pct', positive === true ? 'positive' : positive === false ? 'negative' : '']}>
+          {pctChange !== null
+            ? `${sign}${pctChange.toFixed(2)}%`
+            : bars.length > 0
+              ? (() => {
+                  const last = bars[bars.length - 1].close;
+                  const ytd = ((last - yearOpen) / yearOpen * 100).toFixed(2);
+                  const s = Number(ytd) >= 0 ? '+' : '';
+                  return `${s}${ytd}%`;
+                })()
+              : '—'
+          }
+        </dd>
+      </div>
+    </dl>
+  </div>
+
+  <div class="year-chart" id={`chart-${year}`}></div>
+</section>
+
+<style>
+  .year-panel {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 1.5rem;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+    box-shadow: var(--shadow-md);
+  }
+
+  @media (max-width: 600px) {
+    .year-panel {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .year-heading {
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.75rem;
+  }
+
+  .stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .stat {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  dt {
+    color: var(--muted);
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-family: var(--font-display);
+  }
+
+  dd {
+    font-size: 0.85rem;
+    color: var(--muted-strong);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pct.positive { color: var(--green); }
+  .pct.negative { color: var(--red); }
+
+  .year-chart {
+    min-height: 220px;
+    background: var(--surface-subtle);
+    border-radius: calc(var(--radius-lg) - 4px);
+    overflow: hidden;
+  }
+</style>

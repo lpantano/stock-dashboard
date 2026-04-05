@@ -1,0 +1,13 @@
+[workspace]
+name = "stock-dashboard"
+channels = ["conda-forge"]
+platforms = ["osx-arm64", "linux-64"]
+
+[tasks]
+fetch-data = "python scripts/fetch_data.py"
+
+[dependencies]
+python = ">=3.11"
+pandas = ">=2.0"
+requests = ">=2.31"
+yfinance = ">=0.2.57,<2"

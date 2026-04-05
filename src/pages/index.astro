@@ -1,0 +1,75 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import YearPanel from '../components/YearPanel.astro';
+import ChartsController from '../components/ChartsController';
+import type { SP500Payload } from '../types';
+
+// Imported at build time — baked into the static HTML
+const sp500 = (await import('../../public/data/sp500.json')) as SP500Payload;
+const { years, lastUpdated } = sp500;
+
+const updatedDate = new Date(lastUpdated).toLocaleDateString('en-US', {
+  year: 'numeric', month: 'long', day: 'numeric',
+});
+---
+
+<BaseLayout>
+  <header>
+    <h1>S&amp;P 500</h1>
+    <p class="subtitle">Year-by-year daily closing prices — 2021 through 2026</p>
+    <p class="updated">Updated {updatedDate}</p>
+  </header>
+
+  <main>
+    <ChartsController client:only="react" years={years} />
+    {[...years].reverse().map((yearData) => (
+      <YearPanel data={yearData} />
+    ))}
+  </main>
+
+  <footer>
+    <p>Data sourced from <a href="https://finance.yahoo.com" rel="noopener noreferrer">Yahoo Finance</a>. Refreshed weekly. Not financial advice.</p>
+    <p class="attribution">Built by <a href="https://lpantano.github.io/" rel="noopener noreferrer">Lorena Pantano</a> &middot; <a href="https://www.linkedin.com/in/lpantano/" rel="noopener noreferrer">LinkedIn</a></p>
+  </footer>
+</BaseLayout>
+
+<style>
+  header {
+    margin-bottom: 2.5rem;
+    text-align: center;
+  }
+
+  h1 {
+    font-family: var(--font-head);
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .updated {
+    color: var(--muted);
+    font-size: 0.75rem;
+  }
+
+  footer {
+    margin-top: 3rem;
+    color: var(--muted);
+    font-size: 0.75rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .attribution {
+    color: var(--muted);
+  }
+</style>
