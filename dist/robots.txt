@@ -1,3 +1,0 @@
-User-agent: *
-Allow: /
-Sitemap: https://sp500-dashboard.netlify.app/sitemap-index.xml
