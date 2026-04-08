@@ -3,7 +3,7 @@ name: Refresh S&P 500 Data
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 6 * * 1'   # Every Monday 06:00 UTC (fresh after weekend)
+    - cron: '0 22 * * 1-5'  # Mon–Fri 22:00 UTC (after NYSE close ~21:00 UTC)
 
 permissions:
   contents: write
@@ -20,7 +20,7 @@ jobs:
           cache: true
 
       - name: Fetch latest S&P 500 data
-        run: pixi run fetch-data
+        run: pixi run append-today
 
       - name: Commit updated data
         run: |
@@ -28,7 +28,7 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add public/data/sp500.json
-            git commit -m "chore: refresh S&P 500 data $(date -u +%Y-%m-%d)"
+            git commit -m "chore: add S&P 500 data for $(date -u +%Y-%m-%d)"
             git push
           else
             echo "No data changes to commit"

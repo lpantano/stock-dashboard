@@ -5,9 +5,10 @@ platforms = ["osx-arm64", "linux-64"]
 
 [tasks]
 fetch-data = "python scripts/fetch_data.py"
+append-today = "python scripts/append_today.py"
 
 [dependencies]
-python = ">=3.11"
+python = ">=3.11,<3.14"
 pandas = ">=2.0"
 requests = ">=2.31"
 yfinance = ">=0.2.57,<2"
